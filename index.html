@@ -239,8 +239,136 @@ body{background:var(--bg);color:var(--cr);font-family:'Space Mono',monospace;cur
 .cn-wrap.played{animation:cardPlay .35s ease-out}
 
 /* ════════════════════════
-   MINIMAL TOP BAR
+   PROFILE CARD OVERLAY
 ════════════════════════ */
+#profile-overlay{
+  position:fixed;inset:0;z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(8,6,15,.7);backdrop-filter:blur(10px);
+  opacity:0;pointer-events:none;
+  transition:opacity .25s;
+}
+#profile-overlay.open{opacity:1;pointer-events:auto}
+
+#profile-card{
+  width:min(520px,92vw);
+  background:var(--bg2);
+  border:1px solid var(--br);
+  position:relative;
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path .55s cubic-bezier(.2,.8,.2,1);
+  overflow:hidden;
+}
+#profile-overlay.open #profile-card{
+  clip-path:inset(0 0% 0 0);
+}
+
+/* 내부 요소들 순차 페이드인 */
+#profile-card .pc-header,
+#profile-card .pc-divider,
+#profile-card .pc-rows,
+#profile-card .pc-bio,
+#profile-card .pc-chips,
+#profile-card .pc-deco{
+  opacity:0;
+  transform:translateX(-12px);
+  transition:opacity .35s,transform .35s;
+}
+#profile-overlay.open .pc-header{opacity:1;transform:none;transition-delay:.3s}
+#profile-overlay.open .pc-divider:nth-of-type(1){opacity:1;transform:none;transition-delay:.38s}
+#profile-overlay.open .pc-rows{opacity:1;transform:none;transition-delay:.42s}
+#profile-overlay.open .pc-divider:nth-of-type(2){opacity:1;transform:none;transition-delay:.5s}
+#profile-overlay.open .pc-bio{opacity:1;transform:none;transition-delay:.54s}
+#profile-overlay.open .pc-chips{opacity:1;transform:none;transition-delay:.62s}
+#profile-overlay.open .pc-deco{opacity:1;transform:none;transition-delay:.55s}
+
+/* Top accent line */
+#profile-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--pk),var(--pu),var(--cy));
+}
+
+/* Grid bg */
+#profile-card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,45,120,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,45,120,.03) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+
+.pc-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:28px 28px 0;position:relative;z-index:1;
+}
+.pc-label{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.28em;
+  color:var(--pk);margin-bottom:14px;
+}
+.pc-name{
+  font-family:'Cinzel',serif;font-weight:900;
+  font-size:clamp(28px,5vw,44px);color:var(--cr);
+  letter-spacing:.04em;line-height:.9;
+}
+.pc-name em{color:var(--pk)}
+.pc-handle{
+  font-family:'Space Mono',monospace;font-size:11px;
+  color:var(--mu);letter-spacing:.1em;margin-top:8px;
+}
+
+/* Close button */
+.pc-close{
+  width:32px;height:32px;border:1px solid var(--br);
+  background:transparent;color:var(--mu);
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;cursor:pointer;
+  font-family:'Space Mono',monospace;
+}
+.pc-close:hover{border-color:var(--pk);color:var(--pk);background:rgba(255,45,120,.08)}
+
+.pc-divider{
+  margin:20px 28px 0;height:1px;background:var(--br);position:relative;z-index:1;
+}
+
+.pc-rows{
+  display:flex;flex-direction:column;
+  padding:0 28px;position:relative;z-index:1;
+}
+.pc-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:10px 0;border-bottom:1px solid rgba(30,22,48,.7);
+  font-family:'Cinzel',serif;font-size:12px;
+}
+.pc-row:last-child{border-bottom:0}
+.pc-k{color:var(--mu);letter-spacing:.1em;font-size:10px}
+.pc-v{color:var(--cr);letter-spacing:.04em}
+.pc-v em{color:var(--pk);font-style:normal}
+
+.pc-bio{
+  margin:0 28px;padding:16px;
+  border:1px solid var(--br);background:var(--bg);
+  font-size:12px;color:var(--mu);line-height:1.9;
+  position:relative;z-index:1;
+}
+.pc-bio strong{color:var(--cr)}
+
+.pc-chips{
+  display:flex;flex-wrap:wrap;gap:7px;
+  padding:16px 28px 28px;position:relative;z-index:1;
+}
+.pc-chip{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;
+  color:var(--pu2);border:1px solid rgba(154,112,255,.25);
+  padding:4px 12px;background:rgba(90,53,192,.07);
+}
+
+/* Deco piece */
+.pc-deco{
+  position:absolute;bottom:12px;right:20px;
+  font-size:80px;color:transparent;
+  -webkit-text-stroke:1px rgba(255,45,120,.05);
+  pointer-events:none;user-select:none;z-index:0;
+}
 #topbar{
   position:fixed;top:0;left:0;right:0;z-index:500;
   display:flex;align-items:center;justify-content:space-between;
@@ -349,6 +477,16 @@ body{background:var(--bg);color:var(--cr);font-family:'Space Mono',monospace;cur
   color:transparent;-webkit-text-stroke:1px rgba(255,45,120,.06);pointer-events:none;user-select:none}
 .bio-text{font-size:12px;color:var(--mu);line-height:1.9}
 .bio-text strong{color:var(--cr)}
+.bio-name{
+  color:var(--pk)!important;
+  border-bottom:1px solid rgba(255,45,120,.4);
+  padding-bottom:1px;
+  transition:text-shadow .2s,border-color .2s;
+}
+.bio-name:hover{
+  text-shadow:0 0 12px var(--pk);
+  border-color:var(--pk);
+}
 /* skill bars */
 .sk-list{display:flex;flex-direction:column;gap:10px}
 .sk-row{display:flex;align-items:center;gap:10px;font-family:'Cinzel',serif;font-size:11px}
@@ -576,6 +714,41 @@ footer{border-top:1px solid var(--br);padding:18px 60px;
   <div id="i-skip" onclick="skipIntro()" data-cursor="hover">[ CLICK TO SKIP ]</div>
 </div>
 
+<!-- ═══════ PROFILE CARD OVERLAY ═══════ -->
+<div id="profile-overlay" onclick="closeProfile(event)">
+  <div id="profile-card">
+    <div class="pc-deco">♟</div>
+    <div class="pc-header">
+      <div>
+        <div class="pc-label">PLAYER.PROFILE</div>
+        <div class="pc-name">S3TZ<em>UNA4</em></div>
+        <div class="pc-handle">@s3tzuna4 · github.io</div>
+      </div>
+      <button class="pc-close" onclick="closeProfile()" data-cursor="hover">✕</button>
+    </div>
+    <div class="pc-divider"></div>
+    <div class="pc-rows">
+      <div class="pc-row"><span class="pc-k">AGE</span><span class="pc-v">23</span></div>
+      <div class="pc-row"><span class="pc-k">UNIVERSITY</span><span class="pc-v">명지대학교 <em>— 재학중</em></span></div>
+      <div class="pc-row"><span class="pc-k">MAJOR</span><span class="pc-v">컴퓨터공학</span></div>
+      <div class="pc-row"><span class="pc-k">SPECIALTY</span><span class="pc-v">PWN · <em>REVERSING</em> · IOT</span></div>
+    </div>
+    <div class="pc-divider"></div>
+    <div class="pc-bio">
+      <strong>s3tzuna4</strong>입니다.<br><br>
+      보안에 본격적으로 입문한 건 <em style="color:var(--pk)">2025년</em>이고,<br>
+      시스템 해킹을 제대로 시작한 건 <em style="color:var(--pk)">2026년</em>부터입니다.<br><br>
+      아직 배워가는 중이지만, 시스템을 이해하고<br>
+      파고드는 것을 멈추지 않습니다.
+    </div>
+    <div class="pc-chips">
+      <span class="pc-chip">CTF</span>
+      <span class="pc-chip">SYSTEM HACKING</span>
+      <span class="pc-chip">FORENSICS</span>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════ TOP BAR ═══════ -->
 <div id="topbar">
   <div class="tb-logo"><span class="piece">♟</span> S3TZUNA4</div>
@@ -602,7 +775,7 @@ footer{border-top:1px solid var(--br);padding:18px 60px;
   <div class="h-sub">SECURITY RESEARCHER · HACKER</div>
   <div class="h-desc">
     // <strong>security researcher</strong><br>
-    보안 취약점을 분석하고, 시스템을 이해하기 위해 부숩니다.
+    보안 취약점을 분석하고, 파고드는 것을 멈추지 않습니다.
   </div>
   <div class="h-hint">PICK A CARD TO NAVIGATE ↓</div>
 </section>
@@ -622,7 +795,8 @@ footer{border-top:1px solid var(--br);padding:18px 60px;
         <div class="pcb-handle">@s3tzuna4 · github.io</div>
         <div class="info-rows">
           <div class="ir"><span class="ir-k">LOCATION</span><span class="ir-v">Korea <em>— KST</em></span></div>
-          <div class="ir"><span class="ir-k">STATUS</span><span class="ir-v">Undergraduate</span></div>
+          <div class="ir"><span class="ir-k">STATUS</span><span class="ir-v">명지대 <em>재학중</em></span></div>
+          <div class="ir"><span class="ir-k">MAJOR</span><span class="ir-v">컴퓨터공학</span></div>
           <div class="ir"><span class="ir-k">FIELD</span><span class="ir-v"><em>Security Research</em></span></div>
           <div class="ir"><span class="ir-k">SPECIALTY</span><span class="ir-v">PWN · <em>REVERSING</em> · IOT</span></div>
         </div>
@@ -634,8 +808,9 @@ footer{border-top:1px solid var(--br);padding:18px 60px;
         <div class="acard-body">
           <div class="acard-lbl">BIO.TXT</div>
           <div class="bio-text">
-            안녕하세요, <strong>s3tzuna4</strong>입니다.<br>
-            여기에 본인 소개를 자유롭게 작성하세요.
+            <strong class="bio-name" onclick="openProfile()" data-cursor="hover">s3tzuna4</strong>입니다.<br><br>
+            보안 입문은 <strong>'25년</strong>, 시스템 해킹은 <strong>'26년</strong>부터 시작했습니다.<br>
+            명지대 컴공 재학 중이며, 시스템을 이해하고 파고드는 것을 멈추지 않습니다.
           </div>
         </div>
       </div>
@@ -647,7 +822,6 @@ footer{border-top:1px solid var(--br);padding:18px 60px;
             <span class="fc">REVERSE ENGINEERING</span>
             <span class="fc">IOT HACKING</span>
             <span class="fc">CTF</span>
-            <span class="fc">IOT HACKING</span>
             <span class="fc">HARDWARE</span>
           </div>
         </div>
@@ -1253,6 +1427,24 @@ footer{border-top:1px solid var(--br);padding:18px 60px;
     nav.appendChild(wrap);
   });
 })();
+
+/* ══════════════════════════
+   PROFILE CARD
+══════════════════════════ */
+function openProfile(){
+  const ov=document.getElementById('profile-overlay');
+  ov.classList.add('open');
+  document.documentElement.style.overflow='hidden';
+}
+function closeProfile(e){
+  if(e && e.target!==document.getElementById('profile-overlay') && !e.target.classList.contains('pc-close'))return;
+  const ov=document.getElementById('profile-overlay');
+  ov.classList.remove('open');
+  document.documentElement.style.overflow='';
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeProfile({target:document.getElementById('profile-overlay')});
+});
 
 /* ══════════════════════════
    CLOCK
